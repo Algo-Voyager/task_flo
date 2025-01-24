@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singa Metro Fare Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result,
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .result {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Singa Metro Fare Calculator</h1>
+        <form id="fareForm">
+            <label for="journeys">Enter Your Journeys:</label>
+            <textarea id="journeys" name="journeys"
+                placeholder="FromLine,ToLine,DateTime&#10;Green,Red,2021-03-29T09:00:00&#10;Red,Green,2021-03-29T18:00:00"
+                required></textarea>
+            <button type="submit">Calculate Fare</button>
+        </form>
+        <div id="response" class="result" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <footer>
+        &copy; 2025 Singa Metro Authority. All rights reserved.
+    </footer>
+
+    <script>
+        document.getElementById('fareForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            console.log('Form submitted');
+
+            // Hide previous responses
+            document.getElementById('response').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            const journeysText = document.getElementById('journeys').value.trim();
+            if (!journeysText) {
+                displayError('Please enter at least one journey.');
+                return;
+            }
+
+            const journeys = journeysText.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+            // Validate each journey format
+            for (const journey of journeys) {
+                const parts = journey.split(',');
+                if (parts.length !== 3) {
+                    displayError(`Invalid format for journey: "${journey}". Expected format: "FromLine,ToLine,DateTime"`);
+                    return;
+                }
+                const [fromLine, toLine, dateTime] = parts;
+                if (!['Green', 'Red'].includes(fromLine.trim()) || !['Green', 'Red'].includes(toLine.trim())) {
+                    displayError(`Invalid metro lines in journey: "${journey}". Allowed lines: "Green" or "Red".`);
+                    return;
+                }
+                if (isNaN(Date.parse(dateTime.trim()))) {
+                    displayError(`Invalid DateTime in journey: "${journey}". Please provide a valid ISO date-time format.`);
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch('/api/calculate-fare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ journeys })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResult(`Total Fare: $${data.totalFare}`);
+                } else {
+                    const errorMessages = data.errors ? data.errors.map(err => err.msg).join('; ') : data.error;
+                    displayError(errorMessages || 'An unexpected error occurred.');
+                }
+            } catch (error) {
+                displayError('Failed to connect to the server. Please try again later.');
+                console.error('Error:', error);
+            }
+        });
+
+        function displayResult(message) {
+            const resultDiv = document.getElementById('response');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+
+        function displayError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>
