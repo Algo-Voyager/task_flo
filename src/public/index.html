@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Singa Metro Fare Calculator</title>
+    <title>Fare Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,13 +82,6 @@
             background-color: #f8d7da;
             color: #721c24;
         }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #777;
-            font-size: 14px;
-        }
     </style>
 </head>
 
@@ -106,16 +99,11 @@
         <div id="error" class="error" style="display: none;"></div>
     </div>
 
-    <footer>
-        &copy; 2025 Singa Metro Authority. All rights reserved.
-    </footer>
-
     <script>
         document.getElementById('fareForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             console.log('Form submitted');
 
-            // Hide previous responses
             document.getElementById('response').style.display = 'none';
             document.getElementById('error').style.display = 'none';
 
