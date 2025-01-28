@@ -79,7 +79,7 @@ Calculate fares for multiple journeys.
 **Response:**
 ```json
 {
-    "totalFare": "15.00"
+    "totalFare": 8
 }
 ```
 
@@ -105,19 +105,6 @@ src/
 - `npm run cli` - Run in CLI mode
 - `npm run serve` - Start the server
 
-## Peak Hours
-
-- **Monday to Friday:**
-  - 08:00-10:00
-  - 16:30-19:00
-- **Saturday:**
-  - 10:00-14:00
-  - 18:00-23:00
-- **Sunday:**
-  - 18:00-23:00
-
-## Error Handling
-
-- Input validation for journey format
-- Error responses for invalid requests
-- Global error handler for unexpected errors
+## Performance
+- **Time Complexity:** O(N) where N is the number of trips (lines).
+- **Space Complexity:** O(N) in the worst case due to storage of daily and weekly usage data.

@@ -4,7 +4,6 @@ import cors from 'cors';
 import fareRoutes from './routes/fareRoutes';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import path from "path";
 
 dotenv.config();
 
@@ -16,13 +15,11 @@ export function runServer(): void {
   app.use(helmet());
   app.use(cors());
   app.use(bodyParser.json());
-  app.use(express.static(path.join(__dirname, "public")));
 
   app.get('/', (req: Request, res: Response) => {
-    res.send('Singa Metro Fare Calculation API is running.');
+    res.send('Fare Calculation API is running.');
   });
 
-  // Use Fare Routes
   app.use('/', fareRoutes);
 
   // Global Error Handler
